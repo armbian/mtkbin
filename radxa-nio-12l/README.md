@@ -14,19 +14,21 @@ A simple mirror of https://gitlab.com/mediatek/aiot/bsp/libbase-prebuilt.git at 
 
 ## `Little Kernel (LK)`
 
-Little Kernel for the Radxa NIO-12L is a bit messy.
+The Little Kernel (LK) binary for Radxa NIO-12L is the official prebuilt target `mt8395-evk-ufs/lk.bin` published by MediaTek in their upstream repository:
+https://gitlab.com/mediatek/aiot/rity/lk-prebuilt.git
 
-Collabora provides `lk.bin` binaries at https://gitlab.collabora.com/mediatek/aiot/boot GitLab pipeline artifacts, but:
+### Upstream Version History
 
-1) Recent builds don't work - they seem to expect eMMC, not UFS storage
-2) Old builds have been archived/deleted and are no longer available
+| Version | Commit | Date | Size (Bytes) | SHA-256 Checksum | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **v23.1** | `c76361b` | 2023-08-14 | 260,768 | `20e250b31b071e468c3982a6b0d7baea9fe272964539892b3ae3eea61f4b26da` | Initial Radxa Ubuntu release |
+| **v25.0** | `301e0c9` | 2025-05-20 | 264,968 | `dee68f835d94866819583d25eace422d0f06358b62c4864e1c0b6dff2ebcd9cf` | Previous working UFS DA in Armbian |
+| **v26.1** | `12d7773` | 2026-08-19 | 265,032 | `d907e17b683b094e98ed10d73302d1d9c31efdaa50d271ea8de54f0ed57ec55b` | Current release with 4-GiB sparse fix |
 
-Here we have a mirror of an old working `lk.bin` binary from Collabora (from "sometime around August/September 2025")
-that works with UFS storage. Which exact pipeline produced it is unfortunately unknown.
+### 4-GiB Fastboot Flashing Barrier Fix (v26.1)
 
-**Update (Nov 2026): 4-GiB Fastboot Flashing Barrier Fix**  
-The original Collabora binary contained a 32-bit integer overflow in the Android sparse image handler (`sparse_unsparse` at address `0x210cb0`: `mul w8, w8, w9`), causing LK to silently drop or wrap block offsets when flashing raw images larger than 4 GiB (such as full desktop images > 4 GiB).  
-The `lk.bin` binary is patched in-place (10 instructions updated to 64-bit arithmetic: `umull x8, w8, w9`, `add x23, x23, x8`, `add x20, x20, x8`, and `lsr x8, x20, #0xc`). This enables flawless flashing of images up to the 16 TiB UFS LBA addressing limit without data corruption.
+In earlier versions (up to v26.0), the Android sparse image handler in Little Kernel (`write_sparse_image`) contained a 32-bit integer multiplication overflow (`mul w5, w2, w6`) when calculating chunk byte offsets. This caused fastboot flashing to fail or silently corrupt data when writing disk images larger than 4 GiB.
 
-Also included is an `lk_radxa.bin` binary provided by Radxa in their Ubuntu image for NIO-12L
-`baoshan-classic-desktop-2204-x01-20231005-133-g1200-radxa-nio-12l-ufs-b9`.
+In **v26.1**, MediaTek fixed this upstream (internal commit `3b9265771461598882e6690b28017d487931acd5`), replacing the calculation with 64-bit arithmetic (`umull x3, w2, w7`).
+
+The binary in `radxa-nio-12l/lk/lk.bin` is updated to official upstream **v26.1** (`12d77738d052feefe75127d66ab4a65612c59569`), supporting flawless flashing of large OS images directly out of the box.
