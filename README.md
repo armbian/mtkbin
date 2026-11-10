@@ -4,8 +4,7 @@
 
 This repo contains prebuilt binaries provided by Mediatek (or board vendors) for use with their platforms.
 
-The sources for these binaries are not publicly available, but Mediatek (or boards vendors) provide them as compiled
-binaries.
+The sources for these binaries are not publicly available, but Mediatek provides them as compiled binaries.
 
 This repo is consumed by `armbian/build` framework to build a full boot stack for specific boards; as such it is not
 meant for end-users.
@@ -34,7 +33,7 @@ Here we have organized them, per-board, for easier use and with a GitHub mirror.
 
 ### `Little Kernel (LK)`
 
-The Little Kernel (LK) is a lightweight `fastboot` compatible bootloader used on Mediatek platforms.
+The Little Kernel (LK) is a lightweight `fastboot` compatible bootloader used on Mediatek platforms as a Download Agent (DA).
 
 Mediatek publishes builds in their GitLab repository: https://gitlab.com/mediatek/aiot/rity/lk-prebuilt.git but only
 for their development kits. Board vendors (or Mediatek themselves) provide prebuilt `lk.bin` files for other boards.
